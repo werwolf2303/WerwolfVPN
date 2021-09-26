@@ -2,6 +2,8 @@ package com.werwolfvpn.ui;
 import com.opencsv.exceptions.CsvException;
 import com.werwolfvpn.api.Connect;
 import com.werwolfvpn.api.Disconnect;
+import com.werwolfvpn.api.GetServers;
+import org.apache.commons.collections4.Get;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -50,9 +53,23 @@ public UI()
    JMenu menu = new JMenu("About");
    JMenuItem item = new JMenuItem("Info");
    JMenuItem add = new JMenuItem("Add Connection");
+   JMenuItem delete = new JMenuItem("Delete Connection");
+   delete.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         try {
+            new DeleteDialog();
+         } catch (IOException ioException) {
+            ioException.printStackTrace();
+         } catch (CsvException csvException) {
+            csvException.printStackTrace();
+         }
+      }
+   });
    menuBar.add(menu);
    menu.add(add);
    menu.add(item);
+   menu.add(delete);
    add.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -77,8 +94,14 @@ public UI()
    tfText2 = new JLabel();
    pnPanel1.setLayout( gbPanel1 );
    tfText2.setText("<html><h3>WerwolfVPN</h3><br><a>Click on a VPN Server in this list then on connect</a></html>");
-   String []dataList0 = {"Japan", "Japan2", "Taiwan", "Test"};
-   lsList0 = new JList( dataList0 );
+   GetServers servers = new GetServers();
+   String[] conv = new String[]{};
+   try {
+      conv = servers.getAdded().split("\\[");
+   } catch (IOException ioException) {
+      ioException.printStackTrace();
+   }
+   lsList0 = new JList( conv );
    gbcPanel1.gridx = 0;
    gbcPanel1.gridy = 8;
    gbcPanel1.gridwidth = 20;
@@ -116,7 +139,8 @@ public UI()
          }catch (ArrayIndexOutOfBoundsException aiobee) {
             //Not connected
             Connect connections = new Connect();
-            connections.connect((String)lsList0.getSelectedValue());
+            String toconnect = (String)lsList0.getSelectedValue();
+            connections.connect(toconnect);
             frame.setTitle("WerwolfVPN " + "1.0" + " - " + "ALPHA" + " -        " + "Connected");
          }
       }
@@ -200,6 +224,8 @@ public UI()
       }
    });
    gbcPanel1.gridx = 11;
+   Thread t2 = new Thread(this::addThread);
+   t2.start();
    gbcPanel1.gridy = 18;
    gbcPanel1.gridwidth = 6;
    gbcPanel1.gridheight = 2;
@@ -243,5 +269,21 @@ public UI()
    setContentPane( pnPanel1 );
    pack();
    setVisible( true );
-} 
+}
+public void addThread() {
+   while(true) {
+      File f = new File("Act.txt");
+      if(f.exists()) {
+         GetServers servers = new GetServers();
+         String[] conv = new String[]{};
+         try {
+            conv = servers.getAdded().split("\\[");
+         } catch (IOException ioException) {
+            ioException.printStackTrace();
+         }
+         lsList0.setListData(conv);
+         f.delete();
+      }
+   }
+}
 } 

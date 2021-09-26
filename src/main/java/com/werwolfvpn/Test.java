@@ -7,7 +7,7 @@ import java.io.IOException;
 public class Test {
     public static void main(String[] args) throws IOException, CsvException {
         GetServers servers = new GetServers();
-        servers.csvdownload();
-
+        String[] conv = servers.getAdded().split("\\[");
+        System.out.println(conv[0]);
     }
 }

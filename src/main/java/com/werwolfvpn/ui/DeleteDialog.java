@@ -5,46 +5,38 @@ package com.werwolfvpn.ui;//====================================================
 import com.opencsv.exceptions.CsvException;
 import com.werwolfvpn.api.Create;
 import com.werwolfvpn.api.GetServers;
+import org.apache.commons.collections4.Get;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 
 /**
  * @author  Administrator
  * @created September 26, 2021
  */
-public class Add extends JDialog 
+public class DeleteDialog extends JDialog 
 {
-static Add theAdd;
+static DeleteDialog theDeleteDialog;
 
 JPanel pnPanel0;
-JList tbTable0;
 JButton btBut0;
-/**
- */
+JList lsList0;
 
-/**
- */
-public Add() throws IOException, CsvException {
+public DeleteDialog() throws IOException, CsvException {
    super();
    //super( OWNER, "TITLE", MODAL );
-
+   this.setTitle("This is not working yet");
    pnPanel0 = new JPanel();
-   pnPanel0.setBorder( BorderFactory.createTitledBorder( "Add" ) );
+   pnPanel0.setBorder( BorderFactory.createTitledBorder( "Delete" ) );
    GridBagLayout gbPanel0 = new GridBagLayout();
    GridBagConstraints gbcPanel0 = new GridBagConstraints();
    pnPanel0.setLayout( gbPanel0 );
    GetServers servers = new GetServers();
-   servers.csvdownload();
-   String csv = "";
-   csv = servers.comp;
-   String[] list = csv.replace("null", "").split(",");
-   tbTable0 = new JList(list);
-   JScrollPane scroll = new JScrollPane(tbTable0);
+   lsList0 = new JList(servers.getAdded().split("\\["));
+   JScrollPane scroll = new JScrollPane(lsList0);
    String []colsTable0 = new String[] { "", "" };
    gbcPanel0.gridx = 0;
    gbcPanel0.gridy = 0;
@@ -54,24 +46,18 @@ public Add() throws IOException, CsvException {
    gbcPanel0.weightx = 1;
    gbcPanel0.weighty = 1;
    gbcPanel0.anchor = GridBagConstraints.NORTH;
-   gbPanel0.setConstraints( tbTable0, gbcPanel0 );
+   gbPanel0.setConstraints( lsList0, gbcPanel0 );
    pnPanel0.add( scroll );
 
-   btBut0 = new JButton( "Add"  );
+   btBut0 = new JButton( "Delete"  );
    btBut0.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-         String selected = (String)tbTable0.getSelectedValue();
+         String selected = (String)lsList0.getSelectedValue();
          if(!selected.equals("")) {
             Create create = new Create();
             String[] wand = selected.split(" - ");
             create.create(wand[1],wand[0] + ".opengw.net");
-            File f2 = new File("Act.txt");
-            try {
-               f2.createNewFile();
-            } catch (IOException ioException) {
-               ioException.printStackTrace();
-            }
          }
       }
    });
@@ -92,5 +78,5 @@ public Add() throws IOException, CsvException {
    pack();
    setVisible( true );
    this.setSize(new Dimension(344,299));
-}
+} 
 } 

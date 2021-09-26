@@ -30,6 +30,8 @@ public class GetServers {
         readCSV();
     }
     String out;
+    boolean firsts = false;
+    String outs = "";
     private void readCSV() throws IOException, CsvException {
         String fileName = "download.csv";
         try (CSVReader reader = new CSVReader(new FileReader(fileName))) {
@@ -77,5 +79,28 @@ public class GetServers {
         //System.out.println(ips);
         conv = th.split(",");
         //System.out.println(th);
+    }
+    public String getAdded() throws IOException {
+        Process process = Runtime.getRuntime().exec("powershell Get-VpnConnection");
+        BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line = null;
+        try {
+            while ((line = input.readLine()) != null) {
+                if(line.contains("Name")) {
+                    firsts = true;
+                }
+                if(firsts) {
+                    if(outs=="") {
+                        outs = line;
+                    }else{
+                        outs = outs + "\n" + line;
+                    }
+                }
+                firsts = false;
+            }
+        }catch (IOException es) {
+
+        }
+        return outs.replaceAll("Name                  : ", "[");
     }
 }
