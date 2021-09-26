@@ -1,4 +1,5 @@
 package com.werwolfvpn.ui;
+import com.opencsv.exceptions.CsvException;
 import com.werwolfvpn.api.Connect;
 import com.werwolfvpn.api.Disconnect;
 
@@ -48,8 +49,22 @@ public UI()
    JMenuBar menuBar = new JMenuBar();
    JMenu menu = new JMenu("About");
    JMenuItem item = new JMenuItem("Info");
+   JMenuItem add = new JMenuItem("Add Connection");
    menuBar.add(menu);
+   menu.add(add);
    menu.add(item);
+   add.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         try {
+            new Add();
+         } catch (IOException ex) {
+            ex.printStackTrace();
+         } catch (CsvException ex) {
+            ex.printStackTrace();
+         }
+      }
+   });
    item.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
          new Dialog();
